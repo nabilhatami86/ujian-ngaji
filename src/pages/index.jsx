@@ -26,13 +26,23 @@ const dataQuiz = {
     "غ",
     "ع",
     "ظ",
+    "ــُ",
+    "ــِـ",
+    "ــَـ",
     "ي",
     "ء",
     "هـ",
     "و",
     "ن",
+    "ــّـ",
+    "ــٌـ",
+    "ــٍـ",
+    "ــًـ",
+    "ــْـ",
   ],
+
   shifat: [
+    "د",
     "خ",
     "ح",
     "ج",
@@ -40,27 +50,28 @@ const dataQuiz = {
     "ت",
     "ب",
     "ا",
+    "ط",
+    "ض",
     "ص",
     "ش",
     "س",
     "ز",
     "ر",
     "ذ",
-    "د",
+    "م",
+    "ل",
+    "ك",
     "ق",
     "ف",
     "غ",
     "ع",
     "ظ",
-    "ط",
-    "ض",
+
     "ي",
     "ء",
     "هـ",
     "و",
     "ن",
-    "م",
-    "ل",
   ],
   ahkamHuruf: [
     "Izhhar",
@@ -94,96 +105,10 @@ const dataQuiz = {
 };
 
 const jawabanBenar = {
-  makharij: [
-    "د",
-    "خ",
-    "ح",
-    "ج",
-    "ث",
-    "ت",
-    "ب",
-    "ا",
-    "ط",
-    "ض",
-    "ص",
-    "ش",
-    "س",
-    "ز",
-    "ر",
-    "ذ",
-    "م",
-    "ل",
-    "ك",
-    "ق",
-    "ف",
-    "غ",
-    "ع",
-    "ظ",
-    "ي",
-    "ء",
-    "هـ",
-    "و",
-    "ن",
-  ],
-  shifat: [
-    "خ",
-    "ح",
-    "ج",
-    "ث",
-    "ت",
-    "ب",
-    "ا",
-    "ص",
-    "ش",
-    "س",
-    "ز",
-    "ر",
-    "ذ",
-    "د",
-    "ق",
-    "ف",
-    "غ",
-    "ع",
-    "ظ",
-    "ط",
-    "ض",
-    "ي",
-    "ء",
-    "هـ",
-    "و",
-    "ن",
-    "م",
-    "ل",
-  ],
-  ahkamHuruf: [
-    "Izhhar",
-    "Izhhar Syafawi",
-    "Idzgham Bighunnah",
-    "Ikhfa’ Syafawi",
-    "Idzgham Bilaghunnah",
-    "Idzgham Mimi",
-    "Ikhfa’",
-    "Idzgham Mutajannisain",
-    "Iqlab",
-    "Idzgham Mutaqarribain",
-  ],
-  ahkamMad: [
-    "Mad Thabi’i",
-    "Mad Lazim Kilmi Mutsaqqal",
-    "Mad Wajib Muttashil",
-    "Mad Lazim Kilmi Mukhaffaf",
-    "Mad Jaiz Munfashil",
-    "Mad Lazim Harfi Mutsaqqal",
-    "Mad Iwadz",
-    "Mad Lazim Harfi Mukhaffaf",
-    "Mad Lin",
-    "Mad Badal",
-    "Mad Aridlissukun",
-    "Mad Shilah Qashirah",
-    "Mad Tamkin",
-    "Mad Shilah Thawilah",
-    "Mad Farq",
-  ],
+  makharij: ["ذ", "ح", "ع", "ر", "ظ", "ــّـ"],
+  shifat: ["ذ", "د", "ر", "ظ"],
+  ahkamHuruf: ["Idzgham Bighunnah", "Idzgham Mimi", "Ikhfa’"],
+  ahkamMad: ["Mad Lazim Harfi Mutsaqqal"],
 };
 
 export default function Home() {
@@ -348,10 +273,11 @@ export default function Home() {
         maxWidth: 900,
         margin: "auto",
         padding: 20,
-        fontFamily: "Arial",
+        fontFamily: "LPMQ",
+        fontSize: 20,
       }}
     >
-      <h1>Kuis Huruf Hijaiyah dan Tajwid</h1>
+      <h1>TES SELEKSI 300 ASESOR BACA AL-QUR'AN</h1>
 
       <input
         type="text"
@@ -360,11 +286,25 @@ export default function Home() {
         onChange={(e) => setNama(e.target.value)}
         style={{ marginBottom: 20, width: "100%", padding: 10, fontSize: 16 }}
       />
+      <input
+        type="text"
+        placeholder="Masukkan nomor hp kamu"
+        value={nama}
+        onChange={(e) => setNama(e.target.value)}
+        style={{ marginBottom: 20, width: "300px", padding: 10, fontSize: 16 }}
+      />
+      <input
+        type="text"
+        placeholder="Masukkan email kamu"
+        value={nama}
+        onChange={(e) => setNama(e.target.value)}
+        style={{ marginBottom: 20, width: "100%", padding: 10, fontSize: 16 }}
+      />
 
       {renderTable("makharij", "Makharijul Huruf", dataQuiz.makharij, 8)}
-      {renderTable("shifat", "Shifat Huruf", dataQuiz.shifat, 8)}
-      {renderTable("ahkamHuruf", "Ahkam Huruf", dataQuiz.ahkamHuruf, 5)}
-      {renderTable("ahkamMad", "Ahkam Mad", dataQuiz.ahkamMad, 3)}
+      {renderTable("shifat", "Shifatul Huruf", dataQuiz.shifat, 8)}
+      {renderTable("ahkamHuruf", "Ahkamul Huruf", dataQuiz.ahkamHuruf, 3)}
+      {renderTable("ahkamMad", "Ahkamul Mad Wal Qashr", dataQuiz.ahkamMad, 3)}
 
       <button
         onClick={handleSubmit}
