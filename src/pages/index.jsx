@@ -155,7 +155,7 @@ export default function Home() {
     for (const kategori in jawabanUser) {
       jawabanUser[kategori].forEach((item) => {
         if (jawabanBenar[kategori].includes(item)) {
-          skor += 7.3;
+          skor += 7.2;
         } else {
           skor -= 2;
         }
