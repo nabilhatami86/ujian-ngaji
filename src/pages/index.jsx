@@ -26,19 +26,19 @@ const dataQuiz = {
     "غ",
     "ع",
     "ظ",
-    "ــُ",
-    "ــِـ",
-    "ــَـ",
+    { simbol: "ــُ", arti: "Dlammah" },
+    { simbol: "ــِـ", arti: "Kasrah" },
+    { simbol: "ــَـ", arti: "Fathah" },
     "ي",
     "ء",
     "هـ",
     "و",
     "ن",
-    "ــّـ",
-    "ــٌـ",
-    "ــٍـ",
-    "ــًـ",
-    "ــْـ",
+    { simbol: "ــّـ", arti: "Tasydid" },
+    { simbol: "ــٌـ", arti: "Dlammatain" },
+    { simbol: "ــٍـ", arti: "Kasratain" },
+    { simbol: "ــًـ", arti: "Fathatain" },
+    { simbol: "ــْـ", arti: "Sukun" },
   ],
   shifat: [
     "د",
@@ -229,22 +229,50 @@ export default function Home() {
                 .slice(rowIdx * columns, rowIdx * columns + columns)
                 .map((item) => {
                   const dipilih = jawabanUser[kategori].includes(item);
+                  const isObj = typeof item === "object" && item !== null;
+
                   return (
                     <td
-                      key={item}
+                      key={isObj ? item.simbol : item}
                       onClick={() => toggleJawaban(kategori, item)}
                       style={{
                         border: "1px solid #999",
-                        padding: "10px",
+                        padding: "15px 10px",
                         cursor: "pointer",
                         backgroundColor: dipilih ? "#90ee90" : "white",
                         userSelect: "none",
+                        fontSize: isObj ? 24 : 20,
+                        verticalAlign: "middle",
+                        minWidth: 60,
+                        height: 70,
                       }}
                       title={
                         dipilih ? "Klik untuk batal pilih" : "Klik untuk pilih"
                       }
                     >
-                      {item}
+                      {isObj ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            lineHeight: 1.1,
+                          }}
+                        >
+                          <span style={{ fontSize: 30 }}>{item.simbol}</span>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              marginTop: 4,
+                              color: "#555",
+                            }}
+                          >
+                            {item.arti}
+                          </span>
+                        </div>
+                      ) : (
+                        item
+                      )}
                     </td>
                   );
                 })}
@@ -262,10 +290,18 @@ export default function Home() {
         margin: "auto",
         padding: 20,
         fontFamily: "LPMQ",
-        fontSize: 20,
+        fontSize: 15,
       }}
     >
-      <h1>TES SELEKSI 300 ASESOR BACA AL-QUR'AN</h1>
+      <h1
+        style={{
+          textAlign: "center",
+          fontSize: 24,
+          marginBottom: 20,
+        }}
+      >
+        TES SELEKSI 300 ASESOR BACA AL-QUR'AN
+      </h1>
 
       <input
         type="text"
@@ -279,28 +315,60 @@ export default function Home() {
               : "Minimal 3 huruf. Huruf saja ya!"
           );
         }}
-        style={{ marginBottom: 5, width: "100%", padding: 10, fontSize: 16 }}
+        style={{
+          width: "100%",
+          padding: 10,
+          fontSize: 16,
+          marginBottom: 5,
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          boxSizing: "border-box",
+        }}
       />
       {errorNama && (
-        <div style={{ color: "red", marginBottom: 10 }}>{errorNama}</div>
+        <div
+          style={{
+            color: "red",
+            marginBottom: 10,
+            fontSize: 14,
+          }}
+        >
+          {errorNama}
+        </div>
       )}
 
       <input
         type="text"
-        placeholder="Masukkan nomor hp kamu"
+        placeholder="Masukkan nomor HP (contoh: 08123456789)"
         value={noHp}
         onChange={(e) => {
           setNoHp(e.target.value);
           setErrorNoHp(
             noHpRegex.test(e.target.value)
               ? ""
-              : "Gunakan format +62 atau 08..."
+              : "Nomor HP harus diawali +62 atau 08, dan 8-13 digit"
           );
         }}
-        style={{ marginBottom: 5, width: "100%", padding: 10, fontSize: 16 }}
+        style={{
+          width: "100%",
+          padding: 10,
+          fontSize: 16,
+          marginBottom: 5,
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          boxSizing: "border-box",
+        }}
       />
       {errorNoHp && (
-        <div style={{ color: "red", marginBottom: 10 }}>{errorNoHp}</div>
+        <div
+          style={{
+            color: "red",
+            marginBottom: 10,
+            fontSize: 14,
+          }}
+        >
+          {errorNoHp}
+        </div>
       )}
 
       <input
@@ -310,45 +378,81 @@ export default function Home() {
         onChange={(e) => {
           setEmail(e.target.value);
           setErrorEmail(
-            emailRegex.test(e.target.value) ? "" : "Format email tidak valid."
+            emailRegex.test(e.target.value) ? "" : "Format email tidak valid"
           );
         }}
-        style={{ marginBottom: 5, width: "100%", padding: 10, fontSize: 16 }}
+        style={{
+          width: "100%",
+          padding: 10,
+          fontSize: 16,
+          marginBottom: 15,
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          boxSizing: "border-box",
+        }}
       />
       {errorEmail && (
-        <div style={{ color: "red", marginBottom: 10 }}>{errorEmail}</div>
+        <div
+          style={{
+            color: "red",
+            marginBottom: 10,
+            fontSize: 14,
+          }}
+        >
+          {errorEmail}
+        </div>
       )}
 
-      {renderTable("makharij", "Makharijul Huruf", dataQuiz.makharij, 8)}
-      {renderTable("shifat", "Shifatul Huruf", dataQuiz.shifat, 8)}
-      {renderTable("ahkamHuruf", "Ahkamul Huruf", dataQuiz.ahkamHuruf, 3)}
-      {renderTable("ahkamMad", "Ahkamul Mad Wal Qashr", dataQuiz.ahkamMad, 3)}
+      {renderTable(
+        "makharij",
+        "Makharij Huruf dan Tanda Vokal",
+        dataQuiz.makharij,
+        8
+      )}
+      {renderTable("shifat", "Shifat Huruf", dataQuiz.shifat, 8)}
+      {renderTable("ahkamHuruf", "Ahkam Huruf", dataQuiz.ahkamHuruf, 5)}
+      {renderTable("ahkamMad", "Ahkam Mad", dataQuiz.ahkamMad, 5)}
 
       <button
         onClick={handleSubmit}
-        disabled={loading}
+        disabled={
+          loading ||
+          errorNama ||
+          errorNoHp ||
+          errorEmail ||
+          !nama ||
+          !noHp ||
+          !email
+        }
         style={{
-          marginTop: 20,
-          padding: "15px 30px",
-          fontSize: 18,
-          cursor: "pointer",
+          padding: "12px 30px",
+          fontSize: 16,
+          cursor: loading ? "not-allowed" : "pointer",
           backgroundColor: "#0070f3",
           color: "white",
           border: "none",
           borderRadius: 5,
+          marginTop: 15,
+          width: "100%",
         }}
       >
-        {loading ? "Mengirim..." : "Kirim Jawaban"}
+        {loading ? "Mengirim..." : "Submit Jawaban"}
       </button>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {successMsg && <p style={{ color: "green" }}>{successMsg}</p>}
       {hasil && (
-        <div style={{ marginTop: 20 }}>
-          <p>Skor Mentah: {hasil.nilaiMentah}</p>
-          <p>Persentase Nilai: {hasil.nilaiPersen}%</p>
+        <div style={{ marginTop: 15 }}>
+          <h3>Hasil:</h3>
+          <p>Skor mentah: {hasil.nilaiMentah.toFixed(2)}</p>
+          <p>Persentase nilai: {hasil.nilaiPersen}%</p>
+          <p>Total soal: {hasil.totalSoal}</p>
         </div>
       )}
+
+      {successMsg && (
+        <div style={{ color: "green", marginTop: 15 }}>{successMsg}</div>
+      )}
+
+      {error && <div style={{ color: "red", marginTop: 15 }}>{error}</div>}
     </div>
   );
 }
