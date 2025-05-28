@@ -40,7 +40,6 @@ const dataQuiz = {
     "ــًـ",
     "ــْـ",
   ],
-
   shifat: [
     "د",
     "خ",
@@ -66,7 +65,6 @@ const dataQuiz = {
     "غ",
     "ع",
     "ظ",
-
     "ي",
     "ء",
     "هـ",
@@ -104,6 +102,10 @@ const dataQuiz = {
   ],
 };
 
+const namaRegex = /^[a-zA-Z\s]{3,}$/;
+const noHpRegex = /^(\+62|08)[0-9]{8,13}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const jawabanBenar = {
   makharij: ["ذ", "ح", "ع", "ر", "ظ", "ــّـ"],
   shifat: ["ذ", "د", "ر", "ظ"],
@@ -121,90 +123,81 @@ export default function Home() {
 
   const [hasil, setHasil] = useState(null);
   const [nama, setNama] = useState("");
+  const [noHp, setNoHp] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [errorNama, setErrorNama] = useState("");
+  const [errorNoHp, setErrorNoHp] = useState("");
+  const [errorEmail, setErrorEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
+  const [error, setError] = useState(null);
 
   function toggleJawaban(kategori, item) {
     setJawabanUser((prev) => {
       const sudahPilih = prev[kategori].includes(item);
-      let updated;
-      if (sudahPilih) {
-        updated = prev[kategori].filter((x) => x !== item);
-      } else {
-        updated = [...prev[kategori], item];
-      }
+      let updated = sudahPilih
+        ? prev[kategori].filter((x) => x !== item)
+        : [...prev[kategori], item];
       return { ...prev, [kategori]: updated };
     });
   }
 
   function cekJawaban() {
-    let totalSoal =
+    const totalSoal =
       dataQuiz.makharij.length +
       dataQuiz.shifat.length +
       dataQuiz.ahkamHuruf.length +
       dataQuiz.ahkamMad.length;
 
-    let benar = 0;
+    let skor = 0;
 
     for (const kategori in jawabanUser) {
       jawabanUser[kategori].forEach((item) => {
-        if (jawabanBenar[kategori].includes(item)) benar++;
-      });
-      jawabanUser[kategori].forEach((item) => {
-        if (!jawabanBenar[kategori].includes(item)) benar--;
+        if (jawabanBenar[kategori].includes(item)) {
+          skor += 7.3;
+        } else {
+          skor -= 2;
+        }
       });
     }
 
-    if (benar < 0) benar = 0;
-    if (benar > totalSoal) benar = totalSoal;
+    const maxScore = totalSoal * 7.3;
+    const nilaiPersen = Math.round((skor / maxScore) * 100);
 
-    const nilai = Math.round((benar / totalSoal) * 100);
-
-    setHasil({ benar, totalSoal, nilai });
-
-    return nilai;
+    setHasil({ skor, totalSoal, nilaiPersen, nilaiMentah: skor });
+    return skor;
   }
-  async function handleSubmit() {
+
+  const handleSubmit = async () => {
     setError(null);
     setSuccessMsg(null);
 
-    if (!nama.trim()) {
-      setError("Nama harus diisi!");
+    if (errorNama || errorNoHp || errorEmail || !nama || !noHp || !email)
       return;
-    }
 
     const nilai = cekJawaban();
-
-    console.log("Mengirim data ke backend:", {
-      nama,
-      jawaban: jawabanUser,
-      score: nilai,
-    });
-
     setLoading(true);
     try {
       const res = await fetch("/api/submit", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nama,
+          noHp,
+          email,
           jawaban: jawabanUser,
           score: nilai,
         }),
       });
 
-      console.log("Response status:", res.status);
-
       const data = await res.json();
-      console.log("Response data:", data);
-
       if (!res.ok) throw new Error(data.error || "Gagal submit");
 
       setSuccessMsg("Jawaban berhasil disimpan ke database!");
       setNama("");
+      setNoHp("");
+      setEmail("");
       setJawabanUser({
         makharij: [],
         shifat: [],
@@ -213,59 +206,54 @@ export default function Home() {
       });
       setHasil(null);
     } catch (e) {
-      console.error("Error submit:", e);
       setError(e.message);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  function renderTable(kategori, judul, items, columns) {
-    return (
-      <div style={{ marginBottom: 40 }}>
-        <h2>{judul}</h2>
-        <table
-          style={{
-            borderCollapse: "collapse",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          <tbody>
-            {[...Array(Math.ceil(items.length / columns))].map((_, rowIdx) => (
-              <tr key={rowIdx}>
-                {items
-                  .slice(rowIdx * columns, rowIdx * columns + columns)
-                  .map((item) => {
-                    const dipilih = jawabanUser[kategori].includes(item);
-                    return (
-                      <td
-                        key={item}
-                        onClick={() => toggleJawaban(kategori, item)}
-                        style={{
-                          border: "1px solid #999",
-                          padding: "10px",
-                          cursor: "pointer",
-                          backgroundColor: dipilih ? "#90ee90" : "white",
-                          userSelect: "none",
-                        }}
-                        title={
-                          dipilih
-                            ? "Klik untuk batal pilih"
-                            : "Klik untuk pilih"
-                        }
-                      >
-                        {item}
-                      </td>
-                    );
-                  })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
+  const renderTable = (kategori, judul, items, columns) => (
+    <div style={{ marginBottom: 40 }}>
+      <h2>{judul}</h2>
+      <table
+        style={{
+          borderCollapse: "collapse",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        <tbody>
+          {[...Array(Math.ceil(items.length / columns))].map((_, rowIdx) => (
+            <tr key={rowIdx}>
+              {items
+                .slice(rowIdx * columns, rowIdx * columns + columns)
+                .map((item) => {
+                  const dipilih = jawabanUser[kategori].includes(item);
+                  return (
+                    <td
+                      key={item}
+                      onClick={() => toggleJawaban(kategori, item)}
+                      style={{
+                        border: "1px solid #999",
+                        padding: "10px",
+                        cursor: "pointer",
+                        backgroundColor: dipilih ? "#90ee90" : "white",
+                        userSelect: "none",
+                      }}
+                      title={
+                        dipilih ? "Klik untuk batal pilih" : "Klik untuk pilih"
+                      }
+                    >
+                      {item}
+                    </td>
+                  );
+                })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
   return (
     <div
@@ -283,23 +271,53 @@ export default function Home() {
         type="text"
         placeholder="Masukkan nama kamu"
         value={nama}
-        onChange={(e) => setNama(e.target.value)}
-        style={{ marginBottom: 20, width: "100%", padding: 10, fontSize: 16 }}
+        onChange={(e) => {
+          setNama(e.target.value);
+          setErrorNama(
+            namaRegex.test(e.target.value)
+              ? ""
+              : "Minimal 3 huruf. Huruf saja ya!"
+          );
+        }}
+        style={{ marginBottom: 5, width: "100%", padding: 10, fontSize: 16 }}
       />
+      {errorNama && (
+        <div style={{ color: "red", marginBottom: 10 }}>{errorNama}</div>
+      )}
+
       <input
         type="text"
         placeholder="Masukkan nomor hp kamu"
-        value={nama}
-        onChange={(e) => setNama(e.target.value)}
-        style={{ marginBottom: 20, width: "300px", padding: 10, fontSize: 16 }}
+        value={noHp}
+        onChange={(e) => {
+          setNoHp(e.target.value);
+          setErrorNoHp(
+            noHpRegex.test(e.target.value)
+              ? ""
+              : "Gunakan format +62 atau 08..."
+          );
+        }}
+        style={{ marginBottom: 5, width: "100%", padding: 10, fontSize: 16 }}
       />
+      {errorNoHp && (
+        <div style={{ color: "red", marginBottom: 10 }}>{errorNoHp}</div>
+      )}
+
       <input
-        type="text"
+        type="email"
         placeholder="Masukkan email kamu"
-        value={nama}
-        onChange={(e) => setNama(e.target.value)}
-        style={{ marginBottom: 20, width: "100%", padding: 10, fontSize: 16 }}
+        value={email}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          setErrorEmail(
+            emailRegex.test(e.target.value) ? "" : "Format email tidak valid."
+          );
+        }}
+        style={{ marginBottom: 5, width: "100%", padding: 10, fontSize: 16 }}
       />
+      {errorEmail && (
+        <div style={{ color: "red", marginBottom: 10 }}>{errorEmail}</div>
+      )}
 
       {renderTable("makharij", "Makharijul Huruf", dataQuiz.makharij, 8)}
       {renderTable("shifat", "Shifatul Huruf", dataQuiz.shifat, 8)}
@@ -323,18 +341,12 @@ export default function Home() {
         {loading ? "Mengirim..." : "Kirim Jawaban"}
       </button>
 
-      {error && <p style={{ color: "red", marginTop: 15 }}>{error}</p>}
-      {successMsg && (
-        <p style={{ color: "green", marginTop: 15 }}>{successMsg}</p>
-      )}
-
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {successMsg && <p style={{ color: "green" }}>{successMsg}</p>}
       {hasil && (
         <div style={{ marginTop: 20 }}>
-          <h3>Hasil:</h3>
-          <p>
-            Benar: {hasil.benar} / {hasil.totalSoal}
-          </p>
-          <p>Nilai: {hasil.nilai}</p>
+          <p>Skor Mentah: {hasil.nilaiMentah}</p>
+          <p>Persentase Nilai: {hasil.nilaiPersen}%</p>
         </div>
       )}
     </div>
