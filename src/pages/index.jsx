@@ -136,7 +136,7 @@ export default function Home() {
   function toggleJawaban(kategori, item) {
     setJawabanUser((prev) => {
       const sudahPilih = prev[kategori].includes(item);
-      const updated = sudahPilih
+      let updated = sudahPilih
         ? prev[kategori].filter((x) => x !== item)
         : [...prev[kategori], item];
       return { ...prev, [kategori]: updated };
@@ -215,82 +215,71 @@ export default function Home() {
   const renderTable = (kategori, judul, items, columns) => (
     <div style={{ marginBottom: 40 }}>
       <h2>{judul}</h2>
-      <div
+      <table
         style={{
-          overflowX: "auto",
-          border: "1px solid #ccc",
-          borderRadius: 6,
+          borderCollapse: "collapse",
+          width: "100%",
+          textAlign: "center",
         }}
       >
-        <table
-          style={{
-            borderCollapse: "collapse",
-            width: "100%",
-            minWidth: columns * 70, // agar nggak terlalu kecil di desktop
-            textAlign: "center",
-          }}
-        >
-          <tbody>
-            {[...Array(Math.ceil(items.length / columns))].map((_, rowIdx) => (
-              <tr key={rowIdx}>
-                {items
-                  .slice(rowIdx * columns, rowIdx * columns + columns)
-                  .map((item) => {
-                    const dipilih = jawabanUser[kategori].includes(item);
-                    const isObj = typeof item === "object" && item !== null;
+        <tbody>
+          {[...Array(Math.ceil(items.length / columns))].map((_, rowIdx) => (
+            <tr key={rowIdx}>
+              {items
+                .slice(rowIdx * columns, rowIdx * columns + columns)
+                .map((item) => {
+                  const dipilih = jawabanUser[kategori].includes(item);
+                  const isObj = typeof item === "object" && item !== null;
 
-                    return (
-                      <td
-                        key={isObj ? item.simbol : item}
-                        onClick={() => toggleJawaban(kategori, item)}
-                        style={{
-                          border: "1px solid #999",
-                          padding: "15px 10px",
-                          cursor: "pointer",
-                          backgroundColor: dipilih ? "#90ee90" : "white",
-                          userSelect: "none",
-                          fontSize: isObj ? 24 : 20,
-                          verticalAlign: "middle",
-                          minWidth: 60,
-                          height: 70,
-                        }}
-                        title={
-                          dipilih
-                            ? "Klik untuk batal pilih"
-                            : "Klik untuk pilih"
-                        }
-                      >
-                        {isObj ? (
-                          <div
+                  return (
+                    <td
+                      key={isObj ? item.simbol : item}
+                      onClick={() => toggleJawaban(kategori, item)}
+                      style={{
+                        border: "1px solid #999",
+                        padding: "15px 10px",
+                        cursor: "pointer",
+                        backgroundColor: dipilih ? "#90ee90" : "white",
+                        userSelect: "none",
+                        fontSize: isObj ? 24 : 20,
+                        verticalAlign: "middle",
+                        minWidth: 60,
+                        height: 70,
+                      }}
+                      title={
+                        dipilih ? "Klik untuk batal pilih" : "Klik untuk pilih"
+                      }
+                    >
+                      {isObj ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            lineHeight: 1.1,
+                          }}
+                        >
+                          <span style={{ fontSize: 30 }}>{item.simbol}</span>
+                          <span
                             style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "center",
-                              lineHeight: 1.1,
+                              fontSize: 12,
+                              marginTop: 4,
+                              color: "#555",
                             }}
                           >
-                            <span style={{ fontSize: 30 }}>{item.simbol}</span>
-                            <span
-                              style={{
-                                fontSize: 12,
-                                marginTop: 4,
-                                color: "#555",
-                              }}
-                            >
-                              {item.arti}
-                            </span>
-                          </div>
-                        ) : (
-                          item
-                        )}
-                      </td>
-                    );
-                  })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                            {item.arti}
+                          </span>
+                        </div>
+                      ) : (
+                        item
+                      )}
+                    </td>
+                  );
+                })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 
@@ -298,169 +287,172 @@ export default function Home() {
     <div
       style={{
         maxWidth: 900,
-        margin: "0 auto",
+        margin: "auto",
         padding: 20,
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "LPMQ",
+        fontSize: 15,
       }}
     >
-      <h1 style={{ textAlign: "center" }}>Quiz Huruf Hijaiyah & Tajwid</h1>
+      <h1
+        style={{
+          textAlign: "center",
+          fontSize: 24,
+          marginBottom: 20,
+        }}
+      >
+        TES SELEKSI 300 ASESOR BACA AL-QUR'AN
+      </h1>
 
-      <div style={{ marginBottom: 20 }}>
-        <label>
-          Nama lengkap:{" "}
-          <input
-            type="text"
-            value={nama}
-            onChange={(e) => {
-              setNama(e.target.value);
-              if (!namaRegex.test(e.target.value)) {
-                setErrorNama("Nama minimal 3 huruf dan hanya huruf/spasi");
-              } else {
-                setErrorNama("");
-              }
-            }}
-            style={{ padding: 6, width: "100%", fontSize: 16 }}
-            placeholder="Contoh: Muhammad Nabil"
-          />
-        </label>
-        {errorNama && (
-          <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-            {errorNama}
-          </div>
-        )}
-      </div>
+      <input
+        type="text"
+        placeholder="Masukkan nama kamu"
+        value={nama}
+        onChange={(e) => {
+          setNama(e.target.value);
+          setErrorNama(
+            namaRegex.test(e.target.value)
+              ? ""
+              : "Minimal 3 huruf. Huruf saja ya!"
+          );
+        }}
+        style={{
+          width: "100%",
+          padding: 10,
+          fontSize: 16,
+          marginBottom: 5,
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          boxSizing: "border-box",
+        }}
+      />
+      {errorNama && (
+        <div
+          style={{
+            color: "red",
+            marginBottom: 10,
+            fontSize: 14,
+          }}
+        >
+          {errorNama}
+        </div>
+      )}
 
-      <div style={{ marginBottom: 20 }}>
-        <label>
-          No HP:{" "}
-          <input
-            type="tel"
-            value={noHp}
-            onChange={(e) => {
-              setNoHp(e.target.value);
-              if (!noHpRegex.test(e.target.value)) {
-                setErrorNoHp(
-                  "No HP harus diawali +62 atau 08 dan 8-13 digit angka"
-                );
-              } else {
-                setErrorNoHp("");
-              }
-            }}
-            style={{ padding: 6, width: "100%", fontSize: 16 }}
-            placeholder="Contoh: +6281234567890"
-          />
-        </label>
-        {errorNoHp && (
-          <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-            {errorNoHp}
-          </div>
-        )}
-      </div>
+      <input
+        type="text"
+        placeholder="Masukkan nomor HP (contoh: 08123456789)"
+        value={noHp}
+        onChange={(e) => {
+          setNoHp(e.target.value);
+          setErrorNoHp(
+            noHpRegex.test(e.target.value)
+              ? ""
+              : "Nomor HP harus diawali +62 atau 08, dan 8-13 digit"
+          );
+        }}
+        style={{
+          width: "100%",
+          padding: 10,
+          fontSize: 16,
+          marginBottom: 5,
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          boxSizing: "border-box",
+        }}
+      />
+      {errorNoHp && (
+        <div
+          style={{
+            color: "red",
+            marginBottom: 10,
+            fontSize: 14,
+          }}
+        >
+          {errorNoHp}
+        </div>
+      )}
 
-      <div style={{ marginBottom: 20 }}>
-        <label>
-          Email:{" "}
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (!emailRegex.test(e.target.value)) {
-                setErrorEmail("Email tidak valid");
-              } else {
-                setErrorEmail("");
-              }
-            }}
-            style={{ padding: 6, width: "100%", fontSize: 16 }}
-            placeholder="Contoh: email@example.com"
-          />
-        </label>
-        {errorEmail && (
-          <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-            {errorEmail}
-          </div>
-        )}
-      </div>
+      <input
+        type="email"
+        placeholder="Masukkan email kamu"
+        value={email}
+        onChange={(e) => {
+          setEmail(e.target.value);
+          setErrorEmail(
+            emailRegex.test(e.target.value) ? "" : "Format email tidak valid"
+          );
+        }}
+        style={{
+          width: "100%",
+          padding: 10,
+          fontSize: 16,
+          marginBottom: 15,
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          boxSizing: "border-box",
+        }}
+      />
+      {errorEmail && (
+        <div
+          style={{
+            color: "red",
+            marginBottom: 10,
+            fontSize: 14,
+          }}
+        >
+          {errorEmail}
+        </div>
+      )}
 
-      {renderTable("makharij", "Huruf Hijaiyah", dataQuiz.makharij, 8)}
+      {renderTable(
+        "makharij",
+        "Makharij Huruf dan Tanda Vokal",
+        dataQuiz.makharij,
+        8
+      )}
       {renderTable("shifat", "Shifat Huruf", dataQuiz.shifat, 8)}
       {renderTable("ahkamHuruf", "Ahkam Huruf", dataQuiz.ahkamHuruf, 5)}
       {renderTable("ahkamMad", "Ahkam Mad", dataQuiz.ahkamMad, 5)}
 
-      <div style={{ marginTop: 30, textAlign: "center" }}>
-        <button
-          onClick={handleSubmit}
-          disabled={
-            loading ||
-            !nama ||
-            !noHp ||
-            !email ||
-            errorNama ||
-            errorNoHp ||
-            errorEmail
-          }
-          style={{
-            padding: "12px 30px",
-            fontSize: 18,
-            backgroundColor: loading ? "#ccc" : "#0070f3",
-            color: "white",
-            border: "none",
-            borderRadius: 6,
-            cursor: loading ? "not-allowed" : "pointer",
-          }}
-        >
-          {loading ? "Mengirim..." : "Submit Jawaban"}
-        </button>
-      </div>
+      <button
+        onClick={handleSubmit}
+        disabled={
+          loading ||
+          errorNama ||
+          errorNoHp ||
+          errorEmail ||
+          !nama ||
+          !noHp ||
+          !email
+        }
+        style={{
+          padding: "12px 30px",
+          fontSize: 16,
+          cursor: loading ? "not-allowed" : "pointer",
+          backgroundColor: "#0070f3",
+          color: "white",
+          border: "none",
+          borderRadius: 5,
+          marginTop: 15,
+          width: "100%",
+        }}
+      >
+        {loading ? "Mengirim..." : "Submit Jawaban"}
+      </button>
 
       {hasil && (
-        <div
-          style={{
-            marginTop: 20,
-            padding: 15,
-            borderRadius: 6,
-            backgroundColor: "#e0ffe0",
-            fontWeight: "bold",
-            fontSize: 18,
-            textAlign: "center",
-          }}
-        >
-          Nilai Kamu: {hasil.nilaiPersen} % (Skor mentah:{" "}
-          {hasil.nilaiMentah.toFixed(2)})
+        <div style={{ marginTop: 15 }}>
+          <h3>Hasil:</h3>
+          <p>Skor mentah: {hasil.nilaiMentah.toFixed(2)}</p>
+          <p>Persentase nilai: {hasil.nilaiPersen}%</p>
+          <p>Total soal: {hasil.totalSoal}</p>
         </div>
       )}
 
       {successMsg && (
-        <div
-          style={{
-            marginTop: 20,
-            padding: 15,
-            borderRadius: 6,
-            backgroundColor: "#d4edda",
-            color: "#155724",
-            fontWeight: "bold",
-            textAlign: "center",
-          }}
-        >
-          {successMsg}
-        </div>
+        <div style={{ color: "green", marginTop: 15 }}>{successMsg}</div>
       )}
 
-      {error && (
-        <div
-          style={{
-            marginTop: 20,
-            padding: 15,
-            borderRadius: 6,
-            backgroundColor: "#f8d7da",
-            color: "#721c24",
-            fontWeight: "bold",
-            textAlign: "center",
-          }}
-        >
-          Error: {error}
-        </div>
-      )}
+      {error && <div style={{ color: "red", marginTop: 15 }}>{error}</div>}
     </div>
   );
 }
